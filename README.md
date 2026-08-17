@@ -1,5 +1,7 @@
 # atsproof
 
+**[Try it →](https://mailtoharutyunyan.github.io/atsproof/)**
+
 Fill in a form, get a CV that applicant tracking systems can actually read.
 
 A CV can look immaculate and still extract as nothing useful. Bullets get severed
@@ -76,9 +78,11 @@ Requires Node 22.22.3+, 24.15+, or 26+.
 
 ## Deploying
 
+Live at **https://mailtoharutyunyan.github.io/atsproof/**.
+
 Pushing to `main` builds and publishes to GitHub Pages via
-`.github/workflows/deploy.yml`. Enable it once under **Settings → Pages → Source
-→ GitHub Actions**.
+`.github/workflows/deploy.yml`. It needs enabling once under **Settings → Pages
+→ Source → GitHub Actions**; without it the deploy step fails with a 404.
 
 The workflow derives `--base-href` from the repository name, writes `.nojekyll`,
 and copies `index.html` to `404.html` so deep links resolve.
