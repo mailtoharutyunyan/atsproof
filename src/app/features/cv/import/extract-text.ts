@@ -17,11 +17,12 @@ export class ExtractText {
 
   private async fromPdf(file: File): Promise<string> {
     const pdfjs = await import('pdfjs-dist');
-    // The worker ships alongside the library; point at it explicitly so the
-    // build can fingerprint it rather than fetching from a CDN.
+    // The worker is copied into the build output by angular.json. Resolve it
+    // against document.baseURI so it still loads when the site is served from
+    // a subpath, as it is on GitHub Pages.
     pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-      'pdfjs-dist/build/pdf.worker.mjs',
-      import.meta.url,
+      'pdf.worker.min.mjs',
+      document.baseURI,
     ).toString();
 
     const doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
