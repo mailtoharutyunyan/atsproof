@@ -79,7 +79,9 @@ export class ExtractText {
     if (!entry) throw new Error('That DOCX has no readable document part.');
 
     return strFromU8(entry)
-      .replace(/<w:tab[^>]*\/>/g, ' ')
+      // A tab is a column boundary in Word, the same as a wide gap in a PDF.
+      // Keep it as a double space so the parser can still split the fields.
+      .replace(/<w:tab[^>]*\/>/g, '  ')
       .replace(/<\/w:p>/g, '\n')
       .replace(/<w:br[^>]*\/>/g, '\n')
       .replace(/<[^>]+>/g, '')
@@ -89,7 +91,7 @@ export class ExtractText {
       .replace(/&quot;/g, '"')
       .replace(/&apos;/g, "'")
       .split('\n')
-      .map((l) => l.replace(/\s+/g, ' ').trim())
+      .map((l) => l.replace(/[ \t]{3,}/g, '  ').replace(/ ?\n ?/g, ' ').trim())
       .filter(Boolean)
       .join('\n');
   }

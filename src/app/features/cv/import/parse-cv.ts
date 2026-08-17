@@ -39,6 +39,8 @@ const DATE_RANGE =
   /((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s*\d{4}|\d{4}|present|current)\s*[-–—to]+\s*((jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s*\d{4}|\d{4}|present|current)/i;
 const BULLET = /^[\s]*[•·▪‣⁃*\-–—]\s+/;
 const TECH_LINE = /^(technolog\w*|tech stack|stack|tools?)\s*[:.]/i;
+// "Mercury Development, LLC" has the shape of a location but is a company.
+const COMPANY_SUFFIX = /\b(llc|inc|ltd|limited|gmbh|cjsc|ojsc|jsc|plc|llp|ag|nv|bv|sa|srl|co)\.?$/i;
 // "Berlin, Germany", "Remote", "Remote, United States", "Zurich (Hybrid)".
 const LOCATION_LIKE =
   /^(remote|hybrid|on[- ]?site|[A-Za-zÀ-ÿ'.-]+(?:\s[A-Za-zÀ-ÿ'.-]+)?,\s*[A-Za-zÀ-ÿ'.-]+(?:\s[A-Za-zÀ-ÿ'.-]+){0,2})(\s*\([^)]*\))?$/i;
@@ -224,31 +226,39 @@ function parseRoles(lines: string[]): CvModel['roles'] {
     // needs, and clean() would collapse it away.
     const leftover = lines[i].replace(dates, '').replace(/[|,–—-]\s*$/, '').trim();
 
-    const parts: string[] = [];
-    let place = '';
+    const isPlace = (bit: string) => LOCATION_LIKE.test(bit) && !COMPANY_SUFFIX.test(bit);
 
-    // A location sitting between the company and the dates should not be
-    // mistaken for the company, so file it separately and keep looking up.
-    const take = (bits: string[]) => {
-      for (const bit of bits) {
-        if (!place && LOCATION_LIKE.test(bit)) place = bit;
-        else parts.push(bit);
-      }
-    };
-
-    take(leftover ? splitHeader(leftover) : []);
+    // Collect each line's fields, walking upward, then read them top-down.
+    const rows: string[][] = [];
+    const leftoverBits = leftover ? splitHeader(leftover) : [];
 
     let j = i - 1;
-    while (parts.length < 2 && j >= 0 && !consumed.has(j) && !startSet.has(j)) {
+    while (j >= 0 && !consumed.has(j) && !startSet.has(j)) {
       const prev = lines[j];
       if (isBullet(prev) || TECH_LINE.test(prev) || clean(prev).split(' ').length > 8) break;
       const bits = splitHeader(prev.trim());
-      const before = parts.length;
-      take(bits);
-      // Move anything found above the existing entries: we are walking upward.
-      if (parts.length > before) parts.unshift(...parts.splice(before));
+      const named = bits.filter((b) => !isPlace(b)).length;
+      rows.unshift(bits);
       consumed.add(j);
       j--;
+      // Stop once the company and the title have both been found.
+      if (named + leftoverBits.filter((b) => !isPlace(b)).length >= 2) break;
+    }
+    rows.push(leftoverBits);
+
+    const parts: string[] = [];
+    let place = '';
+    for (const bits of rows) {
+      if (!bits.length) continue;
+      const last = bits[bits.length - 1];
+      // The location trails the company on a header line, so prefer the last
+      // field; anything before it names the company or the role.
+      if (!place && isPlace(last) && (bits.length > 1 || parts.length)) {
+        place = last;
+        parts.push(...bits.slice(0, -1));
+      } else {
+        parts.push(...bits);
+      }
     }
 
     headers.set(i, [...parts, place]);

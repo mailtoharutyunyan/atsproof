@@ -165,3 +165,20 @@ Full Stack Engineer  Mar 2025 - Sep 2025
     expect(result.cv.roles.filter((r) => r.company).length).toBe(0);
   });
 });
+
+describe('parseCv on a tab-separated header', () => {
+  it('splits a Word tab stop the same way as a PDF column gap', () => {
+    // Word writes <w:tab/>, which the extractor turns into a double space.
+    const { cv } = parseCv(`Ada Lovelace
+ada@example.com
+
+EXPERIENCE
+Mercury Development, LLC  Yerevan, Armenia (Remote)
+Senior Frontend Developer  Oct 2022 - Present
+• Shipped the thing.
+`);
+    expect(cv.roles[0].company).toBe('Mercury Development, LLC');
+    expect(cv.roles[0].title).toBe('Senior Frontend Developer');
+    expect(cv.roles[0].place).toBe('Yerevan, Armenia (Remote)');
+  });
+});
