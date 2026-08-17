@@ -1,0 +1,137 @@
+/* Three faces doing three jobs: Plex Sans is the tool, Plex Mono is the
+   machine, Times is the document. Keeping them distinct is the point — the
+   sheet should never look like part of the UI chrome.
+
+   Tokens are semantic, so the light override below only restates colour. The
+   machine layer stays dark in both themes: it stands for the parser, and that
+   constant is doing work. */
+
+:root,
+[data-theme='dark'] {
+  --stage: #14161a;
+  --rail: #1a1d23;
+  --raised: #21252d;
+  --field: #191c22;
+  --hairline: #2c313b;
+  --hairline-soft: #23272f;
+  --hover: rgb(255 255 255 / 0.04);
+  --sunken: rgb(0 0 0 / 0.18);
+
+  --text: #e7e9ee;
+  --text-dim: #99a1b0;
+  --text-faint: #6d7585;
+
+  --accent: #c9a227;
+  --accent-bright: #e0b93c;
+  --accent-ink: #e0b93c; /* accent used as text */
+  --accent-on: #1a1405; /* text on an accent fill */
+  --accent-wash: rgb(201 162 39 / 0.14);
+
+  --error: #f0705f;
+  --warning: #e5b04a;
+  --ok: #6fcf97;
+
+  --shadow-sheet: 0 2px 6px rgb(0 0 0 / 0.5), 0 24px 60px rgb(0 0 0 / 0.45);
+  --shadow-pop: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+[data-theme='light'] {
+  --stage: #dedbd4;
+  --rail: #f4f3f0;
+  --raised: #ffffff;
+  --field: #ffffff;
+  --hairline: #d5d1c8;
+  --hairline-soft: #e4e0d8;
+  --hover: rgb(0 0 0 / 0.035);
+  --sunken: rgb(0 0 0 / 0.025);
+
+  --text: #16181d;
+  --text-dim: #565d6b;
+  --text-faint: #868c99;
+
+  --accent: #a8811a;
+  --accent-bright: #8a6a0d;
+  --accent-ink: #7a5d0a; /* darkened for contrast on paper */
+  --accent-on: #ffffff;
+  --accent-wash: rgb(168 129 26 / 0.12);
+
+  --error: #b3341f;
+  --warning: #8a5d08;
+  --ok: #126b3f;
+
+  --shadow-sheet: 0 1px 3px rgb(40 34 20 / 0.18), 0 18px 44px rgb(40 34 20 / 0.16);
+  --shadow-pop: 0 12px 30px rgb(40 34 20 / 0.2);
+}
+
+:root {
+  /* The document is always ink on paper, whatever the tool is wearing. */
+  --paper: #ffffff;
+  --paper-ink: #000000;
+
+  /* The machine's rendering never changes; it is not part of the chrome. */
+  --machine: #0e1014;
+  --machine-text: #9fe0bd;
+
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--stage);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+::selection {
+  background: var(--accent-wash);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hairline) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--hairline);
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

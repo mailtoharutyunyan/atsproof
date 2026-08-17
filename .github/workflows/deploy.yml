@@ -1,0 +1,57 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let an in-flight deploy finish; queue at most one behind it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      # Pages serves the app from /<repo>/, so the base href must match or
+      # every asset request 404s.
+      - name: Build
+        run: npx ng build --base-href "/${GITHUB_REPOSITORY#*/}/"
+
+      # Without this, Pages' Jekyll pass strips files and folders beginning
+      # with an underscore.
+      - run: touch dist/cv-builder/browser/.nojekyll
+
+      # Single-page app: serve index.html for unknown paths instead of a 404.
+      - run: cp dist/cv-builder/browser/index.html dist/cv-builder/browser/404.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/cv-builder/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

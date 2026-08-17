@@ -1,0 +1,42 @@
+@for (page of pages(); track $index) {
+  <div class="sheet" [style.padding]="pad()">
+    @for (b of page; track $index; let first = $first) {
+      @switch (b.type) {
+        @case ('name') {
+          <p class="name" [style.font-size.pt]="size(b)" [style.margin-top.pt]="gap(b, first)">
+            @for (r of b.runs; track $index) {<span [class.b]="r.bold">{{ r.text }}</span>}
+          </p>
+        }
+        @case ('heading') {
+          <p class="heading" [style.font-size.pt]="size(b)" [style.margin-top.pt]="gap(b, first)">
+            @for (r of b.runs; track $index) {<span class="b">{{ r.text }}</span>}
+          </p>
+        }
+        @case ('split') {
+          <p class="split" [style.font-size.pt]="size(b)" [style.margin-top.pt]="gap(b, first)">
+            <span class="left">
+              @for (r of b.runs; track $index) {<span [class.b]="r.bold" [class.i]="r.italic">{{ r.text }}</span>}
+            </span>
+            <span class="right">
+              @for (r of b.right ?? []; track $index) {<span [class.b]="r.bold" [class.i]="r.italic">{{ r.text }}</span>}
+            </span>
+          </p>
+        }
+        @case ('bullet') {
+          <p class="bullet" [style.font-size.pt]="size(b)" [style.margin-top.pt]="gap(b, first)">
+            @for (r of b.runs; track $index) {<span [class.b]="r.bold" [class.i]="r.italic">{{ r.text }}</span>}
+          </p>
+        }
+        @default {
+          <p [class.center]="b.type !== 'para'" [style.font-size.pt]="size(b)"
+             [style.margin-top.pt]="gap(b, first)">
+            @for (r of b.runs; track $index) {<span [class.b]="r.bold" [class.i]="r.italic">{{ r.text }}</span>}
+          </p>
+        }
+      }
+    }
+    @if (!page.length) {
+      <p class="placeholder">Fill in the form and your CV appears here.</p>
+    }
+  </div>
+}

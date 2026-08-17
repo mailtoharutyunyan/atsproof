@@ -1,0 +1,49 @@
+<div class="stage" #stage>
+  <div class="scaler" [style.transform]="'scale(' + zoom() + ')'">
+    <div class="sheet-frame" [class.dragging]="dragging()"
+         [style.--split.%]="split()" (pointermove)="move($event)">
+
+      <!-- What a person sees -->
+      <div class="layer page">
+        <cv-preview />
+      </div>
+
+      <!-- What the machine reads, clipped to the right of the handle -->
+      <div class="layer machine" aria-hidden="true">
+        <div class="machine-inner" [style.padding]="pad()">
+          <pre>{{ plainText() }}</pre>
+        </div>
+      </div>
+
+      <div class="handle" role="slider" tabindex="0" aria-label="Reveal the parser's view"
+           aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="split().toFixed(0)"
+           (pointerdown)="start($event)" (pointerup)="end($event)" (keydown)="nudge($event)">
+        <span class="line"></span>
+        <span class="grip">
+          <span class="arrow">‹</span>
+          <span class="arrow">›</span>
+        </span>
+      </div>
+
+      <span class="tag left">Recruiter</span>
+      <span class="tag right">Parser</span>
+    </div>
+  </div>
+</div>
+
+<div class="dock">
+  <div class="segment" role="group" aria-label="Reveal">
+    <button type="button" (click)="reveal('page')" [class.on]="split() > 92">Page</button>
+    <button type="button" (click)="reveal('even')" [class.on]="split() > 8 && split() <= 92">Split</button>
+    <button type="button" (click)="reveal('machine')" [class.on]="split() <= 8">Text</button>
+  </div>
+
+  <button type="button" class="fit" (click)="fitToStage()">Fit</button>
+
+  <label class="zoom">
+    <span class="sr-only">Zoom</span>
+    <input type="range" min="0.4" max="1.6" step="0.05" [value]="zoom()"
+           (input)="setZoom($any($event.target).value)" />
+    <span class="value">{{ (zoom() * 100).toFixed(0) }}%</span>
+  </label>
+</div>

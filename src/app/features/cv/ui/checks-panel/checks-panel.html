@@ -1,0 +1,17 @@
+<button type="button" class="head" (click)="toggle()" [attr.aria-expanded]="open()">
+  <span class="verdict-dot" [class.err]="errors() > 0" [class.warn]="!errors() && warnings() > 0"
+        [class.ok]="clean()" aria-hidden="true"></span>
+  <span class="label">{{ headline() }}</span>
+  <span class="chev" [class.up]="open()" aria-hidden="true">›</span>
+</button>
+
+@if (open()) {
+  <ul>
+    @for (f of findings(); track f.title) {
+      <li [class]="f.severity">
+        <strong>{{ f.title }}</strong>
+        <span>{{ f.detail }}</span>
+      </li>
+    }
+  </ul>
+}

@@ -1,0 +1,59 @@
+<header class="bar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true"></span>
+    <span class="wordmark">atsproof</span>
+    <span class="tag">Drag the sheet to see what a parser reads</span>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="import" (click)="cvInput.click()" [disabled]="busy()">
+      <span class="up" aria-hidden="true">↑</span> Import CV
+    </button>
+
+    <div class="menu" (focusout)="closeMenu($event)">
+      <button type="button" class="quiet" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()">
+        Data <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      @if (menuOpen()) {
+        <div class="sheet-menu" role="menu">
+          <button type="button" role="menuitem" (click)="loadSample()">Load the sample</button>
+          <button type="button" role="menuitem" (click)="saveJson()">Save my data (.json)</button>
+          <button type="button" role="menuitem" (click)="fileInput.click()">Open a saved file</button>
+          <hr />
+          <button type="button" role="menuitem" class="danger" (click)="clear()">
+            Clear everything
+          </button>
+        </div>
+      }
+    </div>
+
+    <input #fileInput type="file" accept="application/json,.json" hidden (change)="loadJson($event)" />
+    <input #cvInput type="file" accept=".pdf,.docx,.txt,.md" hidden (change)="importCv($event)" />
+
+    <span class="count" aria-live="polite">{{ pages() }} {{ pages() === 1 ? 'page' : 'pages' }}</span>
+
+    <button type="button" class="quiet theme" (click)="theme.toggle()"
+            [attr.aria-label]="'Switch to ' + (theme.resolved() === 'dark' ? 'light' : 'dark') + ' theme'"
+            [title]="'Switch to ' + (theme.resolved() === 'dark' ? 'light' : 'dark') + ' theme'">
+      {{ theme.resolved() === 'dark' ? '☀' : '☾' }}
+    </button>
+
+    <button type="button" class="quiet" (click)="downloadDocx()" [disabled]="busy()">DOCX</button>
+    <button type="button" class="primary" (click)="downloadPdf()" [disabled]="busy()">
+      Download PDF
+    </button>
+  </div>
+</header>
+
+<p class="status" role="status" aria-live="polite">{{ status() }}</p>
+
+<main>
+  <aside class="rail" aria-label="CV details">
+    <checks-panel />
+    <cv-form />
+  </aside>
+
+  <section class="stage" aria-label="Preview">
+    <xray-sheet />
+  </section>
+</main>

@@ -1,0 +1,384 @@
+:host {
+  display: block;
+}
+
+/* ------------------------------------------------------------------- pips */
+.pips {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin-bottom: 0.6rem;
+  padding: 0.6rem 0.2rem 0.7rem;
+  background: var(--rail);
+}
+
+.progress {
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
+.done {
+  color: var(--accent-ink);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.of {
+  color: var(--text-faint);
+}
+
+.progress-label {
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.62rem;
+  padding-left: 0.2rem;
+}
+
+.pip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.pip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.24rem 0.5rem;
+  font: inherit;
+  font-size: 0.71rem;
+  border-radius: 99px;
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--text-faint);
+  }
+
+  &.current {
+    background: var(--accent-wash);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 600;
+  }
+}
+
+/* State is the information here: hollow, half, solid. */
+.dot {
+  width: 0.44rem;
+  height: 0.44rem;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  flex: 0 0 auto;
+}
+
+.pip.partial .dot {
+  background: linear-gradient(to right, currentColor 50%, transparent 50%);
+}
+
+.pip.done .dot {
+  background: currentColor;
+}
+
+/* ------------------------------------------------------------------ cards */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--raised);
+  overflow: hidden;
+
+  &.open {
+    border-color: var(--accent);
+  }
+}
+
+.head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  font-size: 0.84rem;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover);
+  }
+}
+
+.state {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  border: 1px solid var(--text-faint);
+
+  &.partial {
+    background: linear-gradient(to right, var(--warning) 50%, transparent 50%);
+    border-color: var(--warning);
+  }
+
+  &.done {
+    background: var(--ok);
+    border-color: var(--ok);
+  }
+}
+
+.label {
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+}
+
+.optional {
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  border: 1px solid var(--hairline);
+  border-radius: 99px;
+  padding: 0.05rem 0.35rem;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.chev {
+  color: var(--text-faint);
+  transform: rotate(90deg);
+  transition: transform 0.15s ease;
+}
+
+.card.open .chev {
+  transform: rotate(-90deg);
+}
+
+.body {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+/* ----------------------------------------------------------------- fields */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  min-width: 0;
+
+  > span {
+    font-size: 0.73rem;
+    color: var(--text-dim);
+
+    b {
+      color: var(--accent-ink);
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+  }
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+input,
+textarea {
+  font: inherit;
+  font-size: 0.83rem;
+  padding: 0.44rem 0.55rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  background: var(--field);
+  color: var(--text);
+  width: 100%;
+  min-width: 0;
+
+  &:hover {
+    border-color: var(--text-faint);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-wash);
+  }
+
+  &::placeholder {
+    color: var(--text-faint);
+    opacity: 0.75;
+  }
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+input[type='range'] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--accent);
+
+  &:focus-visible {
+    box-shadow: none;
+  }
+}
+
+small {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  line-height: 1.45;
+}
+
+.row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+
+  .narrow {
+    flex: 0 0 7rem;
+  }
+}
+
+/* ---------------------------------------------------------------- entries */
+.entry {
+  border: 1px solid var(--hairline-soft);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
+  padding: 0.6rem 0.7rem 0.7rem;
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+  }
+
+  h3,
+  h4 {
+    margin: 0;
+    font-size: 0.79rem;
+    font-weight: 600;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* A client sits under its employer, and the connector says so. */
+.nested {
+  margin-top: 0.7rem;
+  padding-left: 0.7rem;
+  border-left: 1px dashed var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.nested-head {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+
+  > span {
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+.entry.sub {
+  border-left-color: var(--text-faint);
+}
+
+.tools {
+  display: inline-flex;
+  gap: 0.1rem;
+}
+
+/* ---------------------------------------------------------------- buttons */
+.icon,
+.add {
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--text-dim);
+  transition: border-color 0.14s ease, color 0.14s ease;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+}
+
+.icon {
+  width: 1.45rem;
+  height: 1.45rem;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.68rem;
+  line-height: 1;
+  padding: 0;
+  flex: 0 0 auto;
+}
+
+.add {
+  font-size: 0.77rem;
+  padding: 0.36rem 0.68rem;
+  border-style: dashed;
+  align-self: flex-start;
+}
+
+@media (max-width: 620px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    flex-wrap: wrap;
+
+    .narrow {
+      flex: 1 1 100%;
+    }
+  }
+}

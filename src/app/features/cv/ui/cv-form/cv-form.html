@@ -1,0 +1,339 @@
+<nav class="pips" aria-label="Sections">
+  <p class="progress">
+    <span class="done">{{ doneCount() }}</span><span class="of">/{{ requiredCount() }}</span>
+    <span class="progress-label">sections filled</span>
+  </p>
+  <div class="pip-row">
+    @for (s of sections(); track s.id) {
+      <button type="button" [class]="'pip ' + s.fill" [class.current]="isOpen(s.id)"
+              (click)="open(s.id)" [attr.aria-current]="isOpen(s.id) ? 'true' : null"
+              [attr.aria-label]="s.label + ': ' + s.count">
+        <span class="dot" aria-hidden="true"></span>
+        <span class="pip-label">{{ s.short }}</span>
+      </button>
+    }
+  </div>
+</nav>
+
+<form (submit)="$event.preventDefault()">
+  @for (s of sections(); track s.id) {
+    <section class="card" [class.open]="isOpen(s.id)">
+      <button type="button" class="head" (click)="toggle(s.id)" [attr.aria-expanded]="isOpen(s.id)">
+        <span [class]="'state ' + s.fill" aria-hidden="true"></span>
+        <span class="label">{{ s.label }}</span>
+        @if (s.optional) {
+          <span class="optional">optional</span>
+        }
+        <span class="count">{{ s.count }}</span>
+        <span class="chev" aria-hidden="true">›</span>
+      </button>
+
+      @if (isOpen(s.id)) {
+        <div class="body">
+          @switch (s.id) {
+            <!-- ----------------------------------------------------- contact -->
+            @case ('contact') {
+              <div class="grid">
+                <label>
+                  <span>Name</span>
+                  <input [ngModel]="cv().firstName" (ngModelChange)="set('firstName', $event)"
+                         name="firstName" autocomplete="given-name" placeholder="Firstname" />
+                </label>
+                <label>
+                  <span>Surname</span>
+                  <input [ngModel]="cv().lastName" (ngModelChange)="set('lastName', $event)"
+                         name="lastName" autocomplete="family-name" placeholder="Lastname" />
+                </label>
+                <label class="full">
+                  <span>Headline</span>
+                  <input [ngModel]="cv().headline" (ngModelChange)="set('headline', $event)"
+                         name="headline"
+                         placeholder="Senior Software Engineer | Java, Spring Boot, AWS" />
+                  <small>Lead with the job title you are applying for. It is scanned first.</small>
+                </label>
+                <label>
+                  <span>Location</span>
+                  <input [ngModel]="cv().location" (ngModelChange)="set('location', $event)"
+                         name="location" placeholder="Berlin, Germany" />
+                </label>
+                <label>
+                  <span>Phone</span>
+                  <input [ngModel]="cv().phone" (ngModelChange)="set('phone', $event)" name="phone"
+                         placeholder="+49 30 1234567" />
+                </label>
+                <label class="full">
+                  <span>Email</span>
+                  <input type="email" [ngModel]="cv().email" (ngModelChange)="set('email', $event)"
+                         name="email" placeholder="you@example.com" />
+                </label>
+                <label class="full">
+                  <span>Links, one per line</span>
+                  <textarea rows="2" [ngModel]="linkText()" (ngModelChange)="setLinks($event)"
+                            name="links"
+                            placeholder="linkedin.com/in/you&#10;github.com/you"></textarea>
+                  <small>Write the address out in full. Link text that hides the URL extracts as nothing.</small>
+                </label>
+              </div>
+            }
+
+            <!-- ----------------------------------------------------- summary -->
+            @case ('summary') {
+              <label class="full">
+                <textarea rows="6" [ngModel]="cv().summary"
+                          (ngModelChange)="set('summary', $event)" name="summary"
+                          placeholder="Senior Software Engineer with 8 years building..."></textarea>
+                <small>Three or four lines: title, years, core stack, then what you are known for.</small>
+              </label>
+            }
+
+            <!-- ------------------------------------------------------ skills -->
+            @case ('skills') {
+              @for (item of cv().skills; track item.id; let i = $index) {
+                <div class="row">
+                  <input class="narrow" [ngModel]="item.label"
+                         (ngModelChange)="patchSkill(i, { label: $event })"
+                         [name]="'skill-label-' + item.id" placeholder="Languages"
+                         aria-label="Skill group" />
+                  <input [ngModel]="item.items" (ngModelChange)="patchSkill(i, { items: $event })"
+                         [name]="'skill-items-' + item.id" placeholder="Java, Kotlin, TypeScript"
+                         aria-label="Skills" />
+                  <button type="button" class="icon" (click)="removeSkill(i)"
+                          [attr.aria-label]="'Remove ' + (item.label || 'skill group')">✕</button>
+                </div>
+              }
+              <button type="button" class="add" (click)="addSkill()">Add skill group</button>
+              <small>Group by category. List only what you can defend in an interview.</small>
+            }
+
+            <!-- -------------------------------------------------- experience -->
+            @case ('experience') {
+              @for (role of cv().roles; track role.id; let ri = $index) {
+                <article class="entry">
+                  <header>
+                    <h3>{{ role.company || 'New role' }}</h3>
+                    <span class="tools">
+                      <button type="button" class="icon" (click)="moveRole(ri, -1)"
+                              aria-label="Move up">↑</button>
+                      <button type="button" class="icon" (click)="moveRole(ri, 1)"
+                              aria-label="Move down">↓</button>
+                      <button type="button" class="icon" (click)="removeRole(ri)"
+                              aria-label="Remove role">✕</button>
+                    </span>
+                  </header>
+                  <div class="grid">
+                    <label>
+                      <span>Company</span>
+                      <input [ngModel]="role.company"
+                             (ngModelChange)="patchRole(ri, { company: $event })"
+                             [name]="'company-' + role.id" placeholder="Northwind Consulting" />
+                    </label>
+                    <label>
+                      <span>Location</span>
+                      <input [ngModel]="role.place" (ngModelChange)="patchRole(ri, { place: $event })"
+                             [name]="'place-' + role.id" placeholder="Berlin, Germany" />
+                    </label>
+                    <label>
+                      <span>Job title</span>
+                      <input [ngModel]="role.title" (ngModelChange)="patchRole(ri, { title: $event })"
+                             [name]="'title-' + role.id" placeholder="Senior Software Engineer" />
+                    </label>
+                    <label>
+                      <span>Dates</span>
+                      <input [ngModel]="role.dates" (ngModelChange)="patchRole(ri, { dates: $event })"
+                             [name]="'dates-' + role.id" placeholder="Mar 2022 - Present" />
+                    </label>
+                    <label class="full">
+                      <span>What the product is</span>
+                      <input [ngModel]="role.blurb" (ngModelChange)="patchRole(ri, { blurb: $event })"
+                             [name]="'blurb-' + role.id"
+                             placeholder="Clinical scheduling platform used by outpatient clinics." />
+                    </label>
+                    <label class="full">
+                      <span>Bullets, one per line</span>
+                      <textarea rows="4" [ngModel]="role.bullets.join('\n')"
+                                (ngModelChange)="setRoleBullets(ri, $event)"
+                                [name]="'bullets-' + role.id"
+                                placeholder="Built the appointment engine covering recurring slots."></textarea>
+                      <small>Start each line with a verb. Add a number wherever you have a real one.</small>
+                    </label>
+                    <label class="full">
+                      <span>Technologies</span>
+                      <input [ngModel]="role.tech" (ngModelChange)="patchRole(ri, { tech: $event })"
+                             [name]="'tech-' + role.id" placeholder="Java 17, Spring Boot, AWS" />
+                    </label>
+                  </div>
+
+                  <div class="nested">
+                    <p class="nested-head">
+                      <span>Client engagements</span>
+                      <small>Add these when one employer placed you with several clients.</small>
+                    </p>
+
+                    @if (role.engagements.length) {
+                      <label class="full">
+                        <span>Note under the company header</span>
+                        <input [ngModel]="role.note" (ngModelChange)="patchRole(ri, { note: $event })"
+                               [name]="'note-' + role.id"
+                               placeholder="Engineering consultancy; embedded in the clients below." />
+                      </label>
+                    }
+
+                    @for (e of role.engagements; track e.id; let ei = $index) {
+                      <article class="entry sub">
+                        <header>
+                          <h4>{{ e.client || 'New client' }}</h4>
+                          <span class="tools">
+                            <button type="button" class="icon" (click)="removeEngagement(ri, ei)"
+                                    aria-label="Remove client">✕</button>
+                          </span>
+                        </header>
+                        <div class="grid">
+                          <label>
+                            <span>Client</span>
+                            <input [ngModel]="e.client"
+                                   (ngModelChange)="patchEngagement(ri, ei, { client: $event })"
+                                   [name]="'e-client-' + e.id" placeholder="Meridian Bank" />
+                          </label>
+                          <label>
+                            <span>Dates</span>
+                            <input [ngModel]="e.dates"
+                                   (ngModelChange)="patchEngagement(ri, ei, { dates: $event })"
+                                   [name]="'e-dates-' + e.id" placeholder="Jan 2024 - Present" />
+                          </label>
+                          <label class="full">
+                            <span>Role on this engagement</span>
+                            <input [ngModel]="e.title"
+                                   (ngModelChange)="patchEngagement(ri, ei, { title: $event })"
+                                   [name]="'e-title-' + e.id" placeholder="Senior Software Engineer" />
+                          </label>
+                          <label class="full">
+                            <span>What the product is</span>
+                            <input [ngModel]="e.blurb"
+                                   (ngModelChange)="patchEngagement(ri, ei, { blurb: $event })"
+                                   [name]="'e-blurb-' + e.id"
+                                   placeholder="Real-time payments platform." />
+                          </label>
+                          <label class="full">
+                            <span>Bullets, one per line</span>
+                            <textarea rows="3" [ngModel]="e.bullets.join('\n')"
+                                      (ngModelChange)="setEngagementBullets(ri, ei, $event)"
+                                      [name]="'e-bullets-' + e.id"></textarea>
+                          </label>
+                          <label class="full">
+                            <span>Technologies</span>
+                            <input [ngModel]="e.tech"
+                                   (ngModelChange)="patchEngagement(ri, ei, { tech: $event })"
+                                   [name]="'e-tech-' + e.id" placeholder="Java 21, Kafka" />
+                          </label>
+                        </div>
+                      </article>
+                    }
+                    <button type="button" class="add" (click)="addEngagement(ri)">
+                      Add client engagement
+                    </button>
+                  </div>
+                </article>
+              }
+              <button type="button" class="add" (click)="addRole()">Add role</button>
+            }
+
+            <!-- ---------------------------------------------------- projects -->
+            @case ('projects') {
+              @for (p of cv().projects; track p.id; let i = $index) {
+                <div class="row">
+                  <input class="narrow" [ngModel]="p.name"
+                         (ngModelChange)="patchProject(i, { name: $event })"
+                         [name]="'proj-name-' + p.id" placeholder="kafka-replay"
+                         aria-label="Project name" />
+                  <input [ngModel]="p.description"
+                         (ngModelChange)="patchProject(i, { description: $event })"
+                         [name]="'proj-desc-' + p.id"
+                         placeholder="Open-source CLI for replaying topics."
+                         aria-label="Project description" />
+                  <button type="button" class="icon" (click)="removeProject(i)"
+                          aria-label="Remove project">✕</button>
+                </div>
+              }
+              <button type="button" class="add" (click)="addProject()">Add project</button>
+              <small>Skip this if you have nothing to put here. One thin entry reads as filler.</small>
+            }
+
+            <!-- --------------------------------------------------- education -->
+            @case ('education') {
+              @for (e of cv().education; track e.id; let i = $index) {
+                <article class="entry">
+                  <header>
+                    <h3>{{ e.school || 'New entry' }}</h3>
+                    <span class="tools">
+                      <button type="button" class="icon" (click)="removeEducation(i)"
+                              aria-label="Remove entry">✕</button>
+                    </span>
+                  </header>
+                  <div class="grid">
+                    <label>
+                      <span>School</span>
+                      <input [ngModel]="e.school"
+                             (ngModelChange)="patchEducation(i, { school: $event })"
+                             [name]="'edu-school-' + e.id"
+                             placeholder="Technical University of Berlin" />
+                    </label>
+                    <label>
+                      <span>Location</span>
+                      <input [ngModel]="e.place" (ngModelChange)="patchEducation(i, { place: $event })"
+                             [name]="'edu-place-' + e.id" placeholder="Berlin, Germany" />
+                    </label>
+                    <label>
+                      <span>Degree</span>
+                      <input [ngModel]="e.degree"
+                             (ngModelChange)="patchEducation(i, { degree: $event })"
+                             [name]="'edu-degree-' + e.id" placeholder="B.Sc. Computer Science" />
+                    </label>
+                    <label>
+                      <span>Dates</span>
+                      <input [ngModel]="e.dates" (ngModelChange)="patchEducation(i, { dates: $event })"
+                             [name]="'edu-dates-' + e.id" placeholder="2014 - 2018" />
+                    </label>
+                  </div>
+                </article>
+              }
+              <button type="button" class="add" (click)="addEducation()">Add education</button>
+
+              <label class="full">
+                <span>Certifications, one per line</span>
+                <textarea rows="3" [ngModel]="certText()" (ngModelChange)="setCerts($event)"
+                          name="certs" placeholder="AWS Certified Solutions Architect, 2023"></textarea>
+              </label>
+              <label class="full">
+                <span>Languages</span>
+                <input [ngModel]="cv().languages" (ngModelChange)="set('languages', $event)"
+                       name="languages" placeholder="English - Fluent (C1) | German - B2" />
+              </label>
+            }
+
+            <!-- ------------------------------------------------------ layout -->
+            @case ('layout') {
+              <div class="grid">
+                <label>
+                  <span>Font size <b>{{ cv().fontSize }}pt</b></span>
+                  <input type="range" min="9" max="12" step="0.5" [ngModel]="cv().fontSize"
+                         (ngModelChange)="set('fontSize', +$event)" name="fontSize" />
+                </label>
+                <label>
+                  <span>Page margin <b>{{ cv().margin }}in</b></span>
+                  <input type="range" min="0.4" max="1" step="0.05" [ngModel]="cv().margin"
+                         (ngModelChange)="set('margin', +$event)" name="margin" />
+                </label>
+                <label class="full">
+                  <span>Spacing <b>{{ cv().spacing }}×</b></span>
+                  <input type="range" min="0.4" max="1.6" step="0.1" [ngModel]="cv().spacing"
+                         (ngModelChange)="set('spacing', +$event)" name="spacing" />
+                  <small>Turn this down to pull a stray last section back onto the previous page.</small>
+                </label>
+              </div>
+            }
+          }
+        </div>
+      }
+    </section>
+  }
+</form>

@@ -1,0 +1,273 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--stage);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 1.1rem;
+  border-bottom: 1px solid var(--hairline);
+  background: var(--rail);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+/* A registration mark — the crosshair a print shop aligns a proof against. */
+.mark {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+  border: 1px solid var(--text-faint);
+  border-radius: 50%;
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    background: var(--accent);
+  }
+
+  &::before {
+    left: 50%;
+    top: -0.22rem;
+    bottom: -0.22rem;
+    width: 1px;
+    transform: translateX(-50%);
+  }
+
+  &::after {
+    top: 50%;
+    left: -0.22rem;
+    right: -0.22rem;
+    height: 1px;
+    transform: translateY(-50%);
+  }
+}
+
+.wordmark {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: lowercase;
+  color: var(--text);
+}
+
+.tag {
+  font-size: 0.76rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  padding-left: 0.65rem;
+  border-left: 1px solid var(--hairline);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  padding: 0 0.5rem;
+}
+
+button {
+  font: inherit;
+  font-size: 0.79rem;
+  padding: 0.42rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: progress;
+  }
+}
+
+.quiet {
+  background: transparent;
+  border-color: var(--hairline);
+  color: var(--text-dim);
+
+  &:hover:not(:disabled) {
+    border-color: var(--text-faint);
+    color: var(--text);
+  }
+}
+
+.import {
+  background: transparent;
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background: var(--accent-wash);
+  }
+
+  .up {
+    font-size: 0.8rem;
+    padding-right: 0.1rem;
+  }
+}
+
+.theme {
+  width: 2rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-on);
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background: var(--accent-bright);
+    border-color: var(--accent-bright);
+    color: var(--accent-on);
+  }
+}
+
+.caret {
+  opacity: 0.6;
+  font-size: 0.7rem;
+}
+
+/* -------------------------------------------------------------- data menu */
+.menu {
+  position: relative;
+}
+
+.sheet-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  min-width: 13rem;
+  padding: 0.3rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--hairline);
+  background: var(--raised);
+  box-shadow: var(--shadow-pop);
+  display: flex;
+  flex-direction: column;
+
+  button {
+    text-align: left;
+    background: transparent;
+    border: 0;
+    color: var(--text-dim);
+    padding: 0.45rem 0.6rem;
+
+    &:hover {
+      background: var(--hover);
+      color: var(--text);
+    }
+  }
+
+  .danger:hover {
+    color: var(--error);
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--hairline-soft);
+    margin: 0.25rem 0;
+  }
+}
+
+/* ----------------------------------------------------------------- status */
+.status {
+  margin: 0;
+  height: 0;
+  overflow: hidden;
+  padding: 0 1.1rem;
+  font-size: 0.78rem;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  transition: height 0.16s ease, padding 0.16s ease;
+
+  &:not(:empty) {
+    height: 1.85rem;
+    padding: 0.38rem 1.1rem;
+  }
+}
+
+/* ------------------------------------------------------------------- body */
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: clamp(340px, 23vw, 520px) 1fr;
+  min-height: 0;
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow: auto;
+  padding: 0.85rem;
+  background: var(--rail);
+  border-right: 1px solid var(--hairline);
+
+  /* Flex children shrink by default; without this the form squashes the
+     checks panel down to a couple of pixels. */
+  > * {
+    flex: 0 0 auto;
+  }
+}
+
+.stage {
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+@media (max-width: 940px) {
+  :host {
+    height: auto;
+    overflow: visible;
+  }
+
+  main {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .stage {
+    height: 80vh;
+  }
+
+  .tag {
+    display: none;
+  }
+}
